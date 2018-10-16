@@ -1,0 +1,281 @@
+<div id="info">
+	<div class="optionDiv">
+		<select name="categoryId">
+		<!-- 栏目信息 去后台获取栏目信息 追加option节点在这里 -->
+		</select>
+		<button class="btn btn-success btn-sm addBtn">
+			新增
+		</button>
+		<button class="btn btn-success btn-sm">
+			批量删除
+		</button>
+	</div>
+	<table class="table table-bordered text-center">
+		<tr>
+			<td>编号</td>
+			<td>文章标题</td>
+			<td>所属栏目</td>
+			<td>排列方式</td>
+			<td>作者</td>
+			<td>发布时间</td>
+			<td>阅读次数</td>
+			<td>操作</td>
+		</tr>
+		
+	</table>
+	<div class="modal" id="infoModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header text-center">
+					<div class="backDiv">
+						<i class="iconfont icon-zuo"></i>
+						<span>返回</span>
+					</div>
+					<div class="modal-title">
+						发布资讯
+					</div>
+				</div>
+				<div class="modal-body">
+					<form class="form">
+						<div class="form-group">
+							<label for="">标题</label>
+							<input type="text" name="infoTitle" class="form-control">
+						</div>
+						<div class="form-group">
+							<label for="">所属栏目</label>
+							<select name="infoCategory" id="" class="form-control">
+								
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="">列表样式</label>
+							<div class="radio">
+								<label for="style-one" >
+									<input type="radio" name="infoList" value="style-one" id="style-one">
+									<img src="images/style-one.jpg" alt="">
+								</label>
+								<label for="style-two" >
+									<input type="radio" name="infoList" value="style-two" id="style-two">
+									<img src="images/style-two.jpg" alt="">
+								</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="">正文</label>
+							<textarea name="infoContent" id="" cols="30" rows="6" class="form-control"></textarea>
+						</div>
+						<div class="form-group hide" >
+							<button type="reset">重置</button>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<span class="messageSpan"></span>
+					<button class="btn btn-success bg-sm saveBtn">发 布</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	$(function(){
+		$('.modal-content').height($(window).height());
+		//全局的当前选中的id，在name=categoryid获取，在name=infocategory（模态框中）设置
+		var currentCId='';
+
+		addCategoryId();
+		//新增
+		$('.addBtn').click(function(){
+			$('button[type=reset]').trigger('click');
+			$('.messageSpan').html('');
+			//查找栏目  追加option 设置值
+			addOption(currentCId);
+
+
+		});
+		//返回
+		$('.backDiv').click(function(){
+			$('#infoModal').hide();
+		});
+		//保存
+		$('.saveBtn').click(
+			function(){
+				var infoTitle=$('input[name=infoTitle]').val();
+				var infoCategory=$('select[name=infoCategory]').val();
+				// 拿到选中的单选按钮 :checked
+				var infoList=$('input[name=infoList]:checked').val();
+				var infoContent=$('textarea[name=infoContent]').val();
+				if(infoTitle&&infoCategory&&infoList&&infoContent){
+					var obj={
+						title: infoTitle,
+						liststyle: infoList,
+						categoryId:infoCategory,
+						content:infoContent,
+					};
+					$.post(baseURL+'/manager/article/saveOrUpdateArticle',obj,function(res){
+						console.log(res);
+						if(res.status==200){
+							alert('保存成功');
+							// 传栏目id
+							// 新增之后，在查找当前栏目下的数据
+							loadData(currentCId);
+							$('#infoModal').hide();
+						}else{
+							console.log(res.message,'保存失败');
+							alert('保存失败');
+						}
+					})
+				}else{
+					$('.messageSpan').html('请输入完整信息');
+				}
+		});
+		//修改
+		
+		$('#info table').on({
+			click:function(){
+				$('#infoModal').show();
+
+				option='修改';
+				var cat=res.data.filter(function(item){
+					return item.id=$(this).closest('tr').find('[type=checkbox]').val();
+				})[0];
+				$('input[type=text]').val(cat.title);
+				// $('select[name=infoCategory]').val(cat.categoryId);
+				$('input[type=radio]').val(cat.liststyle);
+				// $('textarea[name=infoContent]').val(cat.content);
+			}
+		},'[title=修改]');
+			
+		//查找栏目  追加option 设置值 并且显示模态框
+		function addOption(CCId){
+			$('select[name=infoCategory]').empty();
+			$.get(baseURL+'/manager/category/findAllCategory',function(res){
+				res.data.forEach(function(item){
+					var $option=$('<option value="'+item.id+'">'+item.name+'</option>');
+					$('select[name=infoCategory]').append($option);
+				});
+				//
+				$('select[name=infoCategory]').val(CCId);
+				$('#infoModal').show();
+			});
+		}
+
+
+
+		//当select categoryId改变时 获取对应的栏目的文章信息
+		$('select[name=categoryId]').change(function(){
+			//改变的值  this---select 选中的option的值
+			var cId=$(this).val();
+			currentCId=cId;
+			loadData(cId);
+
+		});
+
+
+		//获取所有的栏目信息，追加节点到select中
+		function addCategoryId(){
+			//清空
+			$('.optionDiv select[name=categoryId]').empty();
+			$.get(baseURL+'/manager/category/findAllCategory',function(res){
+				res.data.forEach(function(item){
+					//变量需要用''引起来
+					var $option=$('<option value="'+item.id+'">'+item.name+'</option>');
+					$('.optionDiv select[name=categoryId]').append($option);
+				})
+				currentCId=res.data[0].id;
+				loadData($('.optionDiv select[name=categoryId]').val());
+			});
+		}
+		//通过栏目id加载对应的文章信息
+		function loadData(categoryId){
+			//清空表格 除了第一行
+			$('#info table tr:not(:first)').remove();
+			//给后台的数据
+			var obj={
+				page:0,
+				pageSize:100,
+				categoryId:categoryId,
+			};
+			$.get(baseURL+'/manager/article/findArticle',obj,function(res){
+				// 请求为200时  代表请求成功
+				if(res.status==200){
+					var articles=[];
+				if(res.data){
+					//res.data.list 如果有把数据给了空数组中
+					articles=res.data.list;
+				}articles.forEach(function(item){
+					//
+					var $tr=$(`<tr>
+			<td><input type="checkbox" value="`+item.id+`"></td>
+			<td>`+item.title+`</td>
+			<td>`+item.category.name+`</td>
+			<td>`+item.liststyle+`</td>
+			<td>`+(item.author?item.author:'---')+`</td>
+			<td>`+item.publishtime+`</td>
+			<td>`+item.readtimes+`</td>
+			<td>
+				<i class="iconfont icon-edit-1-copy" title="修改" ></i>
+				<i class="iconfont icon-shanchu" title="删除" ></i>
+			</td>
+		</tr>`);
+					$('#info table').append($tr);
+				});
+				//代表请求失败 后台的原因
+				}else{
+					alert("加载失败");
+					console.log(res.message,'-----');
+				}			
+			});
+		}
+	});
+</script>
+<style>
+	#info{
+		background-color: white;
+		padding: 10px;
+	}
+	#info table{
+		margin-top: 10px;
+	}
+	.optionDiv{
+		overflow: hidden;
+	}
+	.optionDiv *{
+		float: left;
+		margin-right: 5px;
+	}
+	.optionDiv select{
+		width: 200px;
+		height: 30px;
+	}
+	#info table i{
+		color: #63b919;
+		cursor: pointer;
+	}
+	#info table i:nth-child(2){
+		color: red;
+	}
+	.modal{
+		background-color: rgba(0,0,0,0.4);
+
+	}
+	.modal-dialog{
+		margin-top: 0;
+		margin-right: 0;
+		width: 600px;
+	}
+	.modal-content{
+		overflow: auto;
+	}
+	.backDiv{
+		float: left;
+		cursor: pointer;
+	}
+	.messageSpan{
+		color: red;
+	}
+	.modal img{
+		width: 240px;
+		height: 100px;
+	}
+</style>

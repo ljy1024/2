@@ -1,0 +1,61 @@
+<div id="category">
+	<button class=" btn btn-success btn-sm">新增</button>
+	<button class="btn btn-success btn-sm">批量删除</button>
+	<table class="table table-bordered text-center">
+		<tr>
+			<td>编号</td>
+			<td>mingcheng</td>
+			<td>父栏目</td>
+			<td>描述</td>
+			<td>操作</td>
+		</tr>
+	</table>
+	<div class="modal" id="categoryModal">
+		<div class="modal-dialog">
+			<div class="modal-centent">
+				<div class="hader">
+					<i class="iconfont icon-zuo"></i>
+					<span>返回</span>
+				</div>
+				<div class="modal-title">添加栏目</div>
+				<div class="modal-body">
+					<form class="form ">
+						<div class="form-group">
+							<label for="">栏目名称</label>
+							<input type="text" class="form-control" name="categoryName">
+						</div>
+						<div class="form-group">
+							<label for="">父栏目</label>
+							<input type="text" class="form-control" name="categoryParent">
+						</div>
+						<div class="form-group">
+							<label for="">栏目名称</label>
+							<select name="categoryparent" id="">
+								<option value=""></option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="">栏目名称</label>
+							<input type="text" class="form-control" name="categoryName">
+						</div>
+						<div class="form-group">
+							<label for="">栏目名称</label>
+							<input type="text" class="form-control" name="categoryName">
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	$(function(){
+		$('.modal-content').height($(window).height());
+		$('.addBtn').click(function(){
+			$('button[type=reset]').trigger('click');
+			$('.messageSpan').html('');
+		})
+		//
+	})
+</script>

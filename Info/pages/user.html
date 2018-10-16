@@ -1,0 +1,417 @@
+<div id="user">
+	<button class="btn btn-success btn-sm addBtn">新 增</button>
+	<div class="row marginTop">
+		<!-- 放的缩略图 -->
+		<!--  <div class="col-sm-4">
+  			<div class="thumbnail">
+     			<img style="width:150px; height:150px;" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1514093920321&di=913e88c23f382933ef430024afd9128a&imgtype=0&src=http%3A%2F%2Fp.3761.com%2Fpic%2F9771429316733.jpg" alt="图片找不到了" class="img-circle">
+     			<div class="caption">
+     				<div class="row">	 -->
+     								<!-- 向右偏移一列 -->
+       		 			<!-- <div class="col-sm-4 col-sm-offset-1">用户名：</div>
+       		 			<div class="col-sm-7">aaa</div>
+       		 		</div>
+       		 		<div class="row">	 -->
+     								<!-- 向右偏移一列 -->
+       		 			<!-- <div class="col-sm-4 col-sm-offset-1">真实名：</div>
+       		 			<div class="col-sm-7">ljy</div>
+       		 		</div>
+       		 		<div class="row">	 -->
+     								<!-- 向右偏移一列 -->
+       		 			<!-- <div class="col-sm-4 col-sm-offset-1">注册时间</div>
+       		 			<div class="col-sm-7">2018.09.09</div>
+       		 		</div>
+       		 		<div class="row">	
+     								向右偏移一列
+       		 			<div class="col-sm-4 col-sm-offset-1">email：</div>
+       		 			<div class="col-sm-7">834</div>
+       		 		</div>
+       		 		<div class="row">	 -->
+     								<!-- 向右偏移一列 -->
+       		 			<!-- <div class="col-sm-4 col-sm-offset-1">状态：</div>
+       		 			<div class="col-sm-7">
+       		 			<div class="col-sm-7">
+       		 			<input type="hidden" value="1001">
+       		 				<div class="swith">
+       		 					<input type="checkbox">
+       		 				</div>
+       		 			</div>
+       		 			</div>
+       		 		</div>
+   				</div> -->
+ 		<!-- </div>  -->
+	</div>
+	<div class="modal" id="userModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header text-center">
+					<div class="backDiv">
+						<i class="iconfont icon-zuo"></i>
+						<span>返回</span>
+					</div>
+					<div class="modal-title">
+						添加用户
+					</div>
+				</div>
+				<div class="modal-body">
+				<!-- 表单 -->
+					<form class="form">
+					<div class="form-group">
+						<label for="">用户名</label>
+						<input type="text" name="username" class="form-control">
+					</div>
+					<div class="form-group">
+						<label for="">密码</label>
+						<input type="password" name="password" class="form-control">
+					</div>
+					<div class="form-group">
+						<label for="">确认秘密</label>
+						<input type="password" name="password1" class="form-control">
+					</div>
+					<div class="form-group">
+						<label for="">真实姓名</label>
+						<input type="text" name="nickname" class="form-control">
+					</div>
+					<div class="form-group">
+						<label for="">邮箱</label>
+						<input type="email" name="email" class="form-control">
+					</div>
+					<div class="form-group hide" >
+						<button type="reset">重置</button>
+					</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<span class="messageSpan"></span>
+					<button class="btn btn-success btn-sm saveBtn">确认</button>
+				</div>			
+		</div>
+	</div>
+</div>
+<!-- 警告框 -->
+	<div class="alertDiv">
+		<div class="alert alert-success">
+			<strong>提示：</strong>
+			<span>操作成功</span>
+		</div>
+	</div>
+</div>
+<script>
+	$(function(){
+		// 设置.modal-content的高度
+		$('.modal-content').height($(window).height());
+		// 绑定新增事件
+		$('.addBtn').click(function(){
+			// 清空表单数据，显示模态框
+			//模拟点击重置按钮 被隐藏
+			$('button[type=reset]').trigger('click');
+			//获取内部内容 提醒的字 
+			$('.messageSpan').html('');
+			//点击添加用户，让模态框显示
+			$('#userModal').show();
+		});
+		//点击添加用户结束
+		//返回按钮的点击事件
+		$('.backDiv').click(function(){
+			//点击返回，模态框隐藏
+			$('#userModal').hide();
+		});
+		//返回按钮事件结束
+		// 确认按钮的事件
+		$('.saveBtn').click(function(){
+			// 点击后获取input内容，进行简单的表单验证，提示或者提交
+			//获取value值
+			var username = $('input[name=username]').val();
+			var password = $('input[name=password]').val();
+			var password1 = $('input[name=password1]').val();
+			var nickname = $('input[name=nickname]').val();
+			var email = $('input[name=email]').val();
+			//初始为空
+			var message = '';
+			//点击后如果有用户名 密码。。。。都有就执行里面的
+			if(username&&password&&password1&&nickname&&email){
+				//如果都写了 并且两次密码一致 执行下面的
+				if(password==password1){
+					// 提交 建了个obj数组存放新增用户信息
+					var obj = {
+						username:username,
+						password:password,
+						nickname:nickname,
+						email:email,
+					};
+					//发送post请求  地址 拼接   数组   执行成功函数  后台给的响应
+					$.post(baseURL+'/manager/user/saveOrUpdateUser',obj,function(res){
+						//打印成功
+						console.log('保存成功');
+						// 刷新页面，关闭模态框，提示用户保存成功
+						//加载数据 保存成功后就加载 不然还得手动刷新
+						loadData();
+						//成功后隐藏模态框
+						$('#userModal').hide();
+						//增加类  给操作成功提示框上增加了一个类alertDiv的class="animated slideInRight" 也可以写在body中
+						//增加了一个动画 
+						$('.alertDiv').addClass('animated slideInRight');
+						//增加动画后让其显示
+						$('.alertDiv').show();
+						//超时调用 两秒后开始淡出
+						setTimeout(function(){
+							//淡出过程用三秒
+							$('.alertDiv').fadeOut(3000);
+						},2000);
+					});
+					//密码一致的代码结束
+					//如果密码不一致就输出
+				}else{
+					message = "密码不一致";
+				}
+				//没全写，就输出
+			}else{
+				message = "请输入完整的信息";
+			}
+			//把message的值给到.messageSpan元素中 
+			$('.messageSpan').html(message);
+		});
+
+
+		// 开关复选按钮的初始化，设置值 
+		// 事件代理 
+		// $('#user input[type=checkbox]').bootstrapSwitch('state',false);
+		// 绑定事件的事件  事件处理程序 开关按钮改变会触发这个事件
+		$('#user').on({
+			//开关按钮的事件  state--状态 事件名称 两个单词  加引号
+			// 参数   事件对象  改变后的状态
+			'switchChange.bootstrapSwitch':function (event,state) {
+		      // alert(state);
+		      // 点击修改之后，向后台传递参数
+		      // this----input checkbox元素
+		      // 查找id
+		      var id = $(this).closest('.switch').prev('input').val();
+		      // 封装给后台的数据，根据后台的属性名来写对象的属性名。属性值是前端这边来获取的。
+		      var obj = {
+		      	// id值
+		      	id:id,
+		      	// ----------------------------------------------------------------
+		      	status:state
+		      };
+		      // post请求   把obj传给后台
+		      $.post(baseURL+'/manager/user/changeStatus',obj,function(res){
+		      	console.log('执行成功！',res);
+		      })
+		  }
+		  // 真正执行的元素
+		},'[type=checkbox]');
+		//状态复选框结束
+		//加载-----------------------------------------------------------------------------
+		loadData();
+		// 获取数据
+		//loaddata函数
+		function loadData(){
+			// 清空数据  thmgeilemargintop的数据 清空用户表格
+			$('.marginTop').empty();
+			// 打印地址
+			console.log(baseURL,'----');
+			// 发送get请求  地址  执行成功函数
+			$.get(baseURL+'/manager/user/findAllUser',function(res){
+				// 回应中的数据
+				console.log(res.data);
+				// 遍历数据，循环创建缩略图 把后台给的数据进行遍历
+				res.data.forEach(function(item,index){
+					// 建立缩略图 给thm 栅格系统 四列
+					var $thm = $(`<div class="col-sm-4">
+							<!-- 建立一个缩略图 -->
+				    <div class="thumbnail">
+				    	<!-- 头像 地址 三目运算符 img-circle 有这个类图片是圆的-->  
+				      <img style="width: 150px;height: 150px;" src="`+(item.userface?item.userface:'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1514093920321&di=913e88c23f382933ef430024afd9128a&imgtype=0&src=http%3A%2F%2Fp.3761.com%2Fpic%2F9771429316733.jpg')+`" class="img-circle" alt="图片找不到了">
+				     
+				      <div class="caption">
+				    
+				        <div class="row">
+				      
+				        	<div class="col-sm-4 col-sm-offset-1">用户名</div>
+				        
+				        	<div class="col-sm-7">`+(item.username?item.username:'-')+`</div>
+				        </div>
+				        <div class="row">
+				        	<div class="col-sm-4 col-sm-offset-1">真实姓名</div>
+				        	<div class="col-sm-7">`+(item.nickname?item.nickname:'-')+`</div>
+				        </div>
+				        <div class="row">
+				        	<div class="col-sm-4 col-sm-offset-1">注册时间</div>
+				        	<div class="col-sm-7">`+(item.regTime?item.regTime:'-')+`</div>
+				        </div>
+				        <div class="row">
+				        	<div class="col-sm-4 col-sm-offset-1">email</div>
+				        	<div class="col-sm-7">`+(item.email?item.email:'-')+`</div>
+				        </div>
+				     
+				        <div class="row">
+				        	<div class="col-sm-4 col-sm-offset-1">状态</div>
+				        
+				        	<div class="col-sm-7">
+				        	
+				        		<input type="hidden" value="`+item.id+`">
+				        		<div class="switch">
+								      <input type="checkbox"/>
+								</div>
+				        	</div>
+				        </div>
+				      </div>
+				    </div>
+				  </div>`);
+				  // 追加节点 把thm追加在页面上
+				  $('.marginTop').append($thm);
+				  // 在这里控制状态----------------------------------------------------------
+				  $('#user input[type=checkbox]:last').bootstrapSwitch('state',item.enabled);
+				});
+			})
+		}
+	});
+</script>
+<style>
+
+	#user{
+		width: 98%;
+		margin: 0 auto;
+	}
+	.marginTop{
+		margin-top: 10px;
+	}
+	.thumbnail{
+		box-shadow: 3px 3px 3px #cccccc;
+		font-size: 20px;
+		line-height: 40px;
+	}
+	/*.model{
+		background-color: rgba(0,0,0,0.1);
+		height: 100%;
+		width: 100%;
+		margin-top: 0;
+	}
+	.right{
+		height: 100%;
+		width: 300px;
+		background-color: #ffffff;
+		float: right;
+		margin-top: 0;
+	}*/
+	.backDiv{
+		float: left;
+		cursor: pointer;
+	}
+	.messageSpan{
+		color: red;
+	}
+	#userModal{
+		/*设置背景*/
+		background-color: rgba(0,0,0,0.4);
+	}
+	.modal-dialog{
+		/*设置位置*/
+		margin-top: 0;
+		margin-right: 0;
+		width: 400px;
+	}
+	/*.modal-content{
+		height: 600px;
+	}*/
+	.alertDiv{
+		width: 200px;
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		display: none;
+	}
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <div id="user">
+	<div class="container">
+		<div class="btn">
+			<button>新增</button>
+		</div>
+		<div class="list">
+			<div class="row">
+  				<div class="col-sm-6 col-md-4">
+  			 		<div class="thumbnail">
+     					<img src="images/1.png" alt="...">
+     					<div class="caption">
+      						
+       		 				<p>用户名：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vicky</p>
+       		 				<p>真实姓名：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;乔美丽</p>
+       		 				<p>手机号：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;18812344321</p>
+       		 				<p>email：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;qiaoml@briup.cn</p>
+       		 				<p>状态：</p>
+      					</div>
+   					</div>
+  				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	
+</script>
+<style>
+	.caption p{
+		margin-left: 50px;
+		margin-top: 20px;
+	}
+</style> -->
